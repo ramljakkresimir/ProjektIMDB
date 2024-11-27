@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prijava</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="bodyLogin">
+        <div class="login-container">
+            <!-- Login Box -->
+            <div class="login-box" id="loginBox">
+                <h2>Prijava</h2>
+                <form action="index.html" method="POST">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="username" placeholder="Korisničko ime ili Email" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password" placeholder="Lozinka" required>
+                    </div>
+                    <button type="submit" class="login-button">Prijavi se</button>
+                    <p class="forgot-password">
+                        <a href="#">Zaboravili ste lozinku?</a>
+                    </p>
+                </form>
+                <p class="register-link">
+                    Nemate račun? <a href="#" id="showRegister">Registrirajte se</a>
+                </p>
+            </div>
+
+            <!-- Register Box -->
+            <div class="register-box" id="registerBox" style="display: none;">
+                <h2>Registracija</h2>
+                <form action="register.html" method="POST">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" name="username" placeholder="Korisničko ime" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" name="password" placeholder="Lozinka" required>
+                    </div>
+                    <button type="submit" class="login-button">Registriraj se</button>
+                    <p class="login-link">
+                        Već imate račun? <a href="#" id="showLogin">Prijavite se</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="../index.js" charset="utf-8"></script>
+</body>
+</html>
