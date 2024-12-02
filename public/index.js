@@ -2,6 +2,60 @@ const apiKey = '83e3c9dd3e6c9629df9e8f2c03312a72';
 const url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}`;
 const moviesContainer = document.getElementById('movies-container');
 
+document.addEventListener('DOMContentLoaded', () => {
+document.querySelector('#registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+
+    try {
+        const response = await fetch('http://localhost:8000/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message);
+            window.location.href = 'index.html'; // Preusmjeri na početnu stranicu
+        } else {
+            alert(result.error || 'Došlo je do greške.');
+        }
+    } catch (error) {
+        console.error('Greška prilikom registracije:', error);
+        alert('Došlo je do greške.');
+    }
+});
+document.querySelector('#loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const data = Object.fromEntries(formData);
+
+    try {
+        const response = await fetch('http://localhost:8000/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message);
+            window.location.href = 'index.html'; // Preusmjeri na početnu stranicu
+        } else {
+            alert(result.error || 'Došlo je do greške.');
+        }
+    } catch (error) {
+        console.error('Greška prilikom prijave:', error);
+        alert('Došlo je do greške.');
+    }
+});
+});   
 
 //Prkazivanje stranice o odredjenom filmu klikom na film
 document.addEventListener('DOMContentLoaded', () => {
@@ -308,6 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loginBox.style.display = 'block';
     });
 });
+
 
 
 
@@ -628,4 +683,3 @@ const tvShowMoreBtn = document.getElementById('show-more');
     }
 
     fetchTVSeries();
-
