@@ -35,7 +35,7 @@ body {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
   }
-  .btn-login {
+ #login-button  {
     background-color: #ffc107;
     color: #000;
     font-weight: bold;
@@ -731,6 +731,68 @@ table tr:hover {
     background-color: #325883;
 }
 
+
+#login-button:hover {
+    background-color: #e0a800; /* Tamnija zlatna za hover */
+}
+
+/* Stil za korisnički meni */
+#user-menu {
+    position: relative;
+}
+
+#userDropdown {
+    background-color: #343a40; /* Tamna boja */
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+#userDropdown:hover {
+    background-color: #23272b; /* Tamnija boja za hover */
+}
+
+/* Padajući meni */
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #343a40; /* Tamna pozadina */
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 5px;
+    padding: 10px 0;
+    display: none; /* Sakriveno dok nije aktivno */
+}
+
+#userDropdown[aria-expanded="true"] + .dropdown-menu {
+    display: block; /* Prikaži padajući meni kada je dugme aktivno */
+}
+
+/* Stavke u padajućem meniju */
+.dropdown-item {
+    color: #fff;
+    font-size: 14px;
+    padding: 10px 20px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #495057; /* Hover efekat */
+    color: #fff;
+}
+
+
 @media (max-width: 1024px) {
     .containerMovie {
         flex-direction: column; /* Sidebar i glavni sadržaj jedan ispod drugog */
@@ -803,7 +865,16 @@ table tr:hover {
     .tv-series-container {
         gap: 40px;
     }
-   
+    #login-button,
+    #userDropdown {
+        font-size: 14px;
+        padding: 8px 15px;
+    }
+
+    .dropdown-item {
+        font-size: 12px;
+        padding: 8px 15px;
+    }
     
 }
 @media (min-width: 768px) {

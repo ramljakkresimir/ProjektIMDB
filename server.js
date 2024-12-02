@@ -42,27 +42,29 @@ app.post('/register', async (req, res) => {
         res.status(500).json({ error: 'Greška prilikom registracije.' });
       }
     }
-  });
+});
   
 
-  app.post('/login', async (req, res) => {
+app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-  
+
     try {
-      // Dohvati korisnika iz baze
-      const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
-  
-      if (user && (await bcrypt.compare(password, user.password))) {
-        res.status(200).json({ message: 'Prijava uspješna!' });
-      } else {
-        res.status(401).json({ error: 'Neispravno korisničko ime ili lozinka.' });
-      }
+        const user = await db.oneOrNone('SELECT * FROM users WHERE username = $1', [username]);
+
+        if (user && (await bcrypt.compare(password, user.password))) {
+            // Generiraj JWT
+            const token = jwt.sign({ username: user.username, email: user.email }, 'tajni_kljuc', { expiresIn: '1h' });
+            
+            res.status(200).json({ message: 'Prijava uspješna!', token });
+        } else {
+            res.status(401).json({ error: 'Neispravno korisničko ime ili lozinka.' });
+        }
     } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: 'Greška prilikom prijave.' });
+        console.error('Greška prilikom prijave:', err);
+        res.status(500).json({ error: 'Greška prilikom prijave.' });
     }
-  });
-  
+});
+
 
 // Pokretanje servera
 const PORT = 8000;

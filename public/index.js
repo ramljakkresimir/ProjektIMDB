@@ -20,7 +20,7 @@ document.querySelector('#registerForm').addEventListener('submit', async (e) => 
 
         if (response.ok) {
             alert(result.message);
-            window.location.href = 'index.html'; // Preusmjeri na početnu stranicu
+            window.location.href = 'login.html'; // Preusmjeri na početnu stranicu
         } else {
             alert(result.error || 'Došlo je do greške.');
         }
@@ -45,6 +45,8 @@ document.querySelector('#loginForm').addEventListener('submit', async (e) => {
         const result = await response.json();
 
         if (response.ok) {
+            // Sačuvaj token u localStorage
+            localStorage.setItem('token', result.token);
             alert(result.message);
             window.location.href = 'index.html'; // Preusmjeri na početnu stranicu
         } else {
@@ -55,7 +57,39 @@ document.querySelector('#loginForm').addEventListener('submit', async (e) => {
         alert('Došlo je do greške.');
     }
 });
+
 });   
+document.addEventListener('DOMContentLoaded', () => {
+    const loginButton = document.getElementById('login-button');
+    const userMenu = document.getElementById('user-menu');
+    const usernamePlaceholder = document.getElementById('username-placeholder');
+    const logoutButton = document.getElementById('logout-button');
+    const watchlistItem = document.getElementById('watchlist-item');
+
+    // Provera tokena u localStorage
+    const token = localStorage.getItem('token');
+    if (token) {
+        try {
+            const userData = JSON.parse(atob(token.split('.')[1])); // Dekodiraj JWT
+            usernamePlaceholder.textContent = userData.username; // Postavi ime korisnika
+            loginButton.style.display = 'none';
+            userMenu.style.display = 'block';
+            watchlistItem.style.display = 'block'; // Prikaži "Watchlist"
+        } catch (error) {
+            console.error('Greška prilikom dekodiranja tokena:', error);
+            localStorage.removeItem('token'); // Ako token nije validan, ukloni ga
+        }
+    } else {
+        watchlistItem.style.display = 'none'; // Sakrij "Watchlist" ako korisnik nije prijavljen
+    }
+
+    // Dodaj funkcionalnost odjave
+    logoutButton.addEventListener('click', () => {
+        localStorage.removeItem('token');
+        location.reload();
+    });
+});
+
 
 //Prkazivanje stranice o odredjenom filmu klikom na film
 document.addEventListener('DOMContentLoaded', () => {
