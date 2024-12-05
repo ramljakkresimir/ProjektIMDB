@@ -74,21 +74,89 @@ document.addEventListener('DOMContentLoaded', () => {
             usernamePlaceholder.textContent = userData.username; // Postavi ime korisnika
             loginButton.style.display = 'none';
             userMenu.style.display = 'block';
-            watchlistItem.style.display = 'block'; // Prikaži "Watchlist"
+            watchlistItem.style.display = 'block';
         } catch (error) {
             console.error('Greška prilikom dekodiranja tokena:', error);
-            localStorage.removeItem('token'); // Ako token nije validan, ukloni ga
+            localStorage.removeItem('token');
         }
     } else {
-        watchlistItem.style.display = 'none'; // Sakrij "Watchlist" ako korisnik nije prijavljen
+        watchlistItem.style.display = 'none';
     }
-
-    // Dodaj funkcionalnost odjave
     logoutButton.addEventListener('click', () => {
         localStorage.removeItem('token');
         location.reload();
     });
 });
+
+//watchlist 
+document.addEventListener('DOMContentLoaded', () => {
+    const watchlistContainer = document.getElementById('watchlist-container');
+    const token = localStorage.getItem('token');
+
+    if (token) {
+        fetch('http://localhost:8000/watchlist', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        .then(response => response.json())
+        .then(watchlist => {
+            if (watchlist.length === 0) {
+                watchlistContainer.innerHTML = '<p>Vaša Watchlist je prazna.</p>';
+            } else {
+                watchlist.forEach(movie => {
+                    const movieCard = document.createElement('div');
+                    movieCard.classList.add('watchlist-card');
+                    movieCard.innerHTML = `
+                        <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
+                        <div class="watchlist-details">
+                            <h3>${movie.title}</h3>
+                            <p>${movie.overview}</p>
+                            <button class="watchlist-remove-button" data-id="${movie.movie_id}">Ukloni</button>
+                        </div>
+                    `;
+                    
+                    watchlistContainer.appendChild(movieCard);
+                });
+
+                document.querySelectorAll('.watchlist-remove-button').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const movieId = e.target.getAttribute('data-id');
+                        removeFromWatchlist(movieId);
+                    });
+                });
+            }
+        })
+        .catch(error => console.error('Greška prilikom dohvaćanja:', error));
+    } else {
+        watchlistContainer.innerHTML = '<p>Morate se prijaviti da biste videli Watchlist.</p>';
+    }
+});
+
+function removeFromWatchlist(movieId) {
+    const token = localStorage.getItem('token'); // jwt token
+
+    fetch(`http://localhost:8000/watchlist/${movieId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            const movieCard = document.querySelector(`.watchlist-remove-button[data-id="${movieId}"]`).closest('.watchlist-card');
+            if (movieCard) {
+                movieCard.remove();
+            }   
+        } else {
+            return response.json().then(result => {
+                alert(result.error || 'Došlo je do greške.');
+            });
+        }
+    })
+    .catch(error => console.error('Greška prilikom uklanjanja:', error));
+    }
+
 
 
 //Prkazivanje stranice o odredjenom filmu klikom na film
@@ -120,21 +188,20 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                     `;
+
+                    // Dodavanje na Watchlist
                     const addToWatchlistButton = document.getElementById('add-to-watchlist');
                     addToWatchlistButton.addEventListener('click', () => {
-                        const watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
-
-                        if (!watchlist.includes(movieId)) {
-                            watchlist.push(movieId);
-                            localStorage.setItem('watchlist', JSON.stringify(watchlist));
-                            alert('Film je dodan na popis za gledanje!');
-                        } else {
-                            alert('Film je već na popisu za gledanje!');
-                        }
+                        const item = {
+                            id: data.id,
+                            title: data.title, // Naziv filma
+                            poster_path: data.poster_path,
+                            release_date: data.release_date,
+                            overview: data.overview
+                        };
+                        addToWatchlist(item); // Poziva funkciju za dodavanje
                     });
                 }
-                
-                
             })
             .catch(error => console.error('Error fetching movie details:', error));
 
@@ -160,9 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         loadReviews();
-        
     }
 });
+
 
 
 
@@ -239,49 +306,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
 //Prkazivanje stranice o glumcu klikom na sliku glumca
 document.addEventListener('DOMContentLoaded', () => {
+    const seriesGrid = document.getElementById('series-grid');
+    const seriesDetails = document.getElementById('series-details');
+    const reviewsContainer = document.getElementById('reviews-container');
+    const reviewForm = document.getElementById('review-form');
+
     const urlParams = new URLSearchParams(window.location.search);
-    const actorId = urlParams.get('id');
-    const actorDetails = document.getElementById('actor-details');
-    const popularMoviesContainer = document.getElementById('popular-movies');
-    const filmographyTable = document.querySelector('#filmography tbody');
+    const seriesId = urlParams.get('id');
 
-    if (actorId) {
-        // Dohvati osnovne informacije o glumcu
-        fetch(`https://api.themoviedb.org/3/person/${actorId}?api_key=${apiKey}&language=hr`)
+    if (seriesId) {
+        // Dohvati podatke o seriji
+        fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=hr`)
             .then(response => response.json())
-            .then(actor => {
-                document.getElementById('actor-photo').src = `https://image.tmdb.org/t/p/w500${actor.profile_path}`;
-                document.getElementById('actor-name').textContent = actor.name;
-                document.getElementById('actor-biography').textContent = actor.biography || 'Nema dostupnih informacija.';
-                document.getElementById('actor-department').textContent = actor.known_for_department;
-                document.getElementById('actor-birthday').textContent = actor.birthday || 'Nepoznato';
-                document.getElementById('actor-place').textContent = actor.place_of_birth || 'Nepoznato';
-                document.getElementById('actor-popularity').textContent = actor.popularity.toFixed(1);
-            });
-
-        // Dohvati popularne uloge
-        fetch(`https://api.themoviedb.org/3/person/${actorId}/movie_credits?api_key=${apiKey}&language=hr`)
-            .then(response => response.json())
-            .then(credits => {
-                credits.cast.slice(0, 6).forEach(movie => {
-                    const img = document.createElement('img');
-                    img.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
-                    img.alt = movie.title;
-                    img.title = movie.title;
-                    popularMoviesContainer.appendChild(img);
-                });
-
-                // Filmografija
-                credits.cast.forEach(movie => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${movie.release_date ? movie.release_date.split('-')[0] : 'Nepoznato'}</td>
-                        <td>${movie.title}</td>
-                        <td>${movie.character || 'Nepoznato'}</td>
+            .then(data => {
+                if (seriesDetails) {
+                    seriesDetails.innerHTML = `
+                        <div class="series-header">
+                            <img src="https://image.tmdb.org/t/p/w500${data.poster_path}" alt="${data.name}">
+                            <div>
+                                <h1>${data.name}</h1>
+                                <p>${data.overview}</p>
+                                <p><strong>Ocjena:</strong> ${data.vote_average}</p>
+                                <p><strong>Žanr:</strong> ${data.genres.map(genre => genre.name).join(', ')}</p>
+                                <p><strong>Datum prve epizode:</strong> ${data.first_air_date}</p>
+                                <button id="add-to-watchlist" class="btn btn-warning mt-3">Dodaj na popis za gledanje</button>
+                            </div>
+                        </div>
                     `;
-                    filmographyTable.appendChild(row);
-                });
+
+                    // Dodavanje serije na Watchlist
+                    const addToWatchlistButton = document.getElementById('add-to-watchlist');
+                    addToWatchlistButton.addEventListener('click', () => {
+                        const item = {
+                            id: data.id,
+                            title: data.name, // Naziv serije
+                            poster_path: data.poster_path,
+                            release_date: data.first_air_date,
+                            overview: data.overview
+                        };
+                        addToWatchlist(item); // Koristi funkciju za dodavanje na Watchlist
+                    });
+                }
+            })
+            .catch(error => console.error('Error fetching series details:', error));
+
+        function loadReviews() {
+            const reviews = JSON.parse(localStorage.getItem(`reviews-${seriesId}`)) || [];
+            if (reviewsContainer) {
+                reviewsContainer.innerHTML = reviews.map(review => `<p>${review}</p>`).join('');
+            }
+        }
+
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const reviewText = document.getElementById('review-text').value;
+
+                const reviews = JSON.parse(localStorage.getItem(`reviews-${seriesId}`)) || [];
+                reviews.push(reviewText);
+                localStorage.setItem(`reviews-${seriesId}`, JSON.stringify(reviews));
+
+                loadReviews();
+                reviewForm.reset();
             });
+        }
+
+        loadReviews();
     }
 });
 
@@ -430,7 +520,7 @@ function loadMovies() {
         const imgElement = document.createElement('img');
         imgElement.src = fullPosterUrl;
         imgElement.alt = title;
-        
+
         movieCard.appendChild(imgElement);
 
         const movieInfo = document.createElement('div');
@@ -455,7 +545,7 @@ function loadMovies() {
         watchlistButton.textContent = '+ Watchlist';
         watchlistButton.addEventListener('click', (event) => {
             event.stopPropagation();
-            addToWatchlist(movie); 
+            addToWatchlist(movie);
         });
 
         actionButtons.appendChild(watchlistButton);
@@ -469,19 +559,65 @@ function loadMovies() {
         moviesContainer.appendChild(movieCard);
     });
 }
+
+function addToWatchlist(movie) {
+    const token = localStorage.getItem('token'); // JWT token
+
+    if (token) {
+        
+        fetch('http://localhost:8000/watchlist', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                movie_id: movie.id,
+                title: movie.title,
+                poster_path: movie.poster_path,
+                release_date: movie.release_date,
+                overview: movie.overview
+            })
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                return response.json().then(result => {
+                    throw new Error(result.error || 'Došlo je do greške.');
+                });
+            }
+        })
+        .then(result => {
+            alert('Uspješno dodano u Watchlist!'); // Alert za uspješno dodavanje
+        })
+        .catch(error => {
+            alert(error.message); // Alert za grešku
+            console.error('Greška:', error);
+        });
+    } else {
+        alert('Morate se prijaviti da biste dodali u Watchlist!'); // Alert za korisnika koji nije prijavljen
+    }
+}
+
+
+
 function leftArrow() {
     startIndex = Math.max(0, startIndex - moviesToShow);
     loadMovies();
 }
+
 function rightArrow() {
-    startIndex = Math.min(10 - moviesToShow, startIndex + moviesToShow); 
+    startIndex = Math.min(10 - moviesToShow, startIndex + moviesToShow);
     loadMovies();
 }
+
 window.addEventListener('resize', () => {
     updateMoviesToShow();
     loadMovies();
 });
-fetch(url)
+
+fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&language=hr`)
     .then(response => response.json())
     .then(data => {
         moviesData = data.results.slice(0, 10);
@@ -489,8 +625,6 @@ fetch(url)
         loadMovies();
     })
     .catch(error => console.error('Error fetching trending movies:', error));
-
-
 
 //Istraži nove TV serije   
 let seriesData = [];
@@ -546,9 +680,25 @@ function loadSeries() {
 
         seriesCard.appendChild(seriesInfo);
 
+        // Dodavanje dugmeta za Watchlist
         const actionButtons = document.createElement('div');
         actionButtons.classList.add('tv-series-buttons');
-        actionButtons.innerHTML = `<button>+ Watchlist</button>`;
+
+        const watchlistButton = document.createElement('button');
+        watchlistButton.textContent = '+ Watchlist';
+        watchlistButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // Sprečava navigaciju pri kliku na dugme
+            const item = {
+                id: series.id,
+                title: series.name,
+                poster_path: series.poster_path,
+                release_date: series.first_air_date,
+                overview: series.overview
+            };
+            addToWatchlist(item); // Dodaj u Watchlist koristeći centralizovanu funkciju
+        });
+
+        actionButtons.appendChild(watchlistButton);
         seriesCard.appendChild(actionButtons);
 
         tvSeriesContainer.appendChild(seriesCard);
@@ -572,7 +722,7 @@ window.addEventListener('resize', () => {
     updateSeriesToShow();
     loadSeries();
 });
-fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${apiKey}`)
+fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${apiKey}&language=hr`)
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
@@ -621,8 +771,9 @@ const showMoreBtn = document.getElementById('show-more');
             movieDiv.innerHTML = `
                 <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="${movie.title}">
                 <h3>${movie.title}</h3>
-                <p>Ocjena: ${movie.vote_average}</p>
+                <p>Ocjena:${movie.vote_average}</p>
             `;
+            
             movieDiv.setAttribute('data-movie-id', movie.id);
             movieDiv.addEventListener('click', () => {
                 window.location.href = `film.html?id=${movie.id}`;
@@ -717,3 +868,4 @@ const tvShowMoreBtn = document.getElementById('show-more');
     }
 
     fetchTVSeries();
+

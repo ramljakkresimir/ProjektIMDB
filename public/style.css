@@ -792,6 +792,59 @@ table tr:hover {
     color: #fff;
 }
 
+/*watchlist*/
+#watchlist-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.watchlist-card {
+    display: flex;
+    gap: 20px;
+    background-color: #1E3E62;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.watchlist-card img {
+    width: 100px;
+    height: auto;
+    border-radius: 5px;
+}
+
+.watchlist-details {
+    flex-grow: 1;
+}
+
+.watchlist-details h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #fff;
+}
+
+.watchlist-details p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #fff;
+}
+
+.watchlist-remove-button {
+    background-color: #ff4d4d;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.watchlist-remove-button:hover {
+    background-color: #cc0000;
+}
+
 
 @media (max-width: 1024px) {
     .containerMovie {
