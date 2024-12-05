@@ -262,77 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                         </div>
                     `;
-                    const addToWatchlistButton = document.getElementById('add-to-watchlist');
-                    addToWatchlistButton.addEventListener('click', () => {
-                        const watchlist = JSON.parse(localStorage.getItem('watchlist')) || [];
-
-                        if (!watchlist.includes(seriesId)) {
-                            watchlist.push(seriesId);
-                            localStorage.setItem('watchlist', JSON.stringify(watchlist));
-                            alert('Serija je dodana na popis za gledanje!');
-                        } else {
-                            alert('Serija je već na popisu za gledanje!');
-                        }
-                    });
-                }
-            })
-            .catch(error => console.error('Error fetching series details:', error));
-
-        function loadReviews() {
-            const reviews = JSON.parse(localStorage.getItem(`reviews-${seriesId}`)) || [];
-            if (reviewsContainer) {
-                reviewsContainer.innerHTML = reviews.map(review => `<p>${review}</p>`).join('');
-            }
-        }
-
-        if (reviewForm) {
-            reviewForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const reviewText = document.getElementById('review-text').value;
-
-                const reviews = JSON.parse(localStorage.getItem(`reviews-${seriesId}`)) || [];
-                reviews.push(reviewText);
-                localStorage.setItem(`reviews-${seriesId}`, JSON.stringify(reviews));
-
-                loadReviews();
-                reviewForm.reset();
-            });
-        }
-
-        loadReviews();
-    }
-});
-
-
-//Prkazivanje stranice o glumcu klikom na sliku glumca
-document.addEventListener('DOMContentLoaded', () => {
-    const seriesGrid = document.getElementById('series-grid');
-    const seriesDetails = document.getElementById('series-details');
-    const reviewsContainer = document.getElementById('reviews-container');
-    const reviewForm = document.getElementById('review-form');
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const seriesId = urlParams.get('id');
-
-    if (seriesId) {
-        // Dohvati podatke o seriji
-        fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=hr`)
-            .then(response => response.json())
-            .then(data => {
-                if (seriesDetails) {
-                    seriesDetails.innerHTML = `
-                        <div class="series-header">
-                            <img src="https://image.tmdb.org/t/p/w500${data.poster_path}" alt="${data.name}">
-                            <div>
-                                <h1>${data.name}</h1>
-                                <p>${data.overview}</p>
-                                <p><strong>Ocjena:</strong> ${data.vote_average}</p>
-                                <p><strong>Žanr:</strong> ${data.genres.map(genre => genre.name).join(', ')}</p>
-                                <p><strong>Datum prve epizode:</strong> ${data.first_air_date}</p>
-                                <button id="add-to-watchlist" class="btn btn-warning mt-3">Dodaj na popis za gledanje</button>
-                            </div>
-                        </div>
-                    `;
 
                     // Dodavanje serije na Watchlist
                     const addToWatchlistButton = document.getElementById('add-to-watchlist');
@@ -375,6 +304,54 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
+
+//Prkazivanje stranice o glumcu klikom na sliku glumca
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const actorId = urlParams.get('id');
+    const actorDetails = document.getElementById('actor-details');
+    const popularMoviesContainer = document.getElementById('popular-movies');
+    const filmographyTable = document.querySelector('#filmography tbody');
+    if (actorId) {
+        // Dohvati osnovne informacije o glumcu
+        fetch(`https://api.themoviedb.org/3/person/${actorId}?api_key=${apiKey}&language=hr`)
+            .then(response => response.json())
+            .then(actor => {
+                document.getElementById('actor-photo').src = `https://image.tmdb.org/t/p/w500${actor.profile_path}`;
+                document.getElementById('actor-name').textContent = actor.name;
+                document.getElementById('actor-biography').textContent = actor.biography || 'Nema dostupnih informacija.';
+                document.getElementById('actor-department').textContent = actor.known_for_department;
+                document.getElementById('actor-birthday').textContent = actor.birthday || 'Nepoznato';
+                document.getElementById('actor-place').textContent = actor.place_of_birth || 'Nepoznato';
+                document.getElementById('actor-popularity').textContent = actor.popularity.toFixed(1);
+            });
+    const seriesId = urlParams.get('id');
+
+        // Dohvati popularne uloge
+        fetch(`https://api.themoviedb.org/3/person/${actorId}/movie_credits?api_key=${apiKey}&language=hr`)
+        .then(response => response.json())
+            .then(credits => {
+                credits.cast.slice(0, 6).forEach(movie => {
+                    const img = document.createElement('img');
+                    img.src = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+                    img.alt = movie.title;
+                    img.title = movie.title;
+                    popularMoviesContainer.appendChild(img);
+                });
+                // Filmografija
+                credits.cast.forEach(movie => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${movie.release_date ? movie.release_date.split('-')[0] : 'Nepoznato'}</td>
+                        <td>${movie.title}</td>
+                        <td>${movie.character || 'Nepoznato'}</td>
+                        `;
+                    filmographyTable.appendChild(row);
+                });
+            });
+        }
+    });
 
 //GLUMCI
 let actorsData = [];
