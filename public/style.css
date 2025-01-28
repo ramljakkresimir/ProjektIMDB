@@ -845,6 +845,212 @@ table tr:hover {
     background-color: #cc0000;
 }
 
+/* Styling for the comments section */
+#comments-section {
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 800px;
+    border-top: 2px solid #444;
+    background-color: #222; /* Tamna pozadina */
+    color: #ddd; /* Svijetli tekst */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+#comments-section h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 2rem;
+    color: #ffcc00; /* Zlatna boja za isticanje */
+    font-weight: bold;
+}
+
+/* List of comments */
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Individual comment card */
+.comment {
+    background-color: #333; /* Tamnija pozadina za komentare */
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.comment:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* Header for username and timestamp */
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.comment-username {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #ffcc00; /* Zlatna za korisničko ime */
+}
+
+.comment-timestamp {
+    font-size: 0.9rem;
+    color: #bbb; /* Neutralna za datum/vrijeme */
+}
+
+/* Text of the comment */
+.comment-text {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #ddd;
+}
+
+/* Like button */
+.like-button {
+    margin-top: 10px;
+    background-color: #007bff; /* Plava */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.like-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+/* Comment form styling */
+#comment-form {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: #333; /* Tamna pozadina */
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+#comment-form textarea {
+    width: 100%;
+    height: 120px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 1rem;
+    background-color: #222; /* Tamna pozadina */
+    color: #ddd; /* Svijetli tekst */
+    resize: none;
+}
+
+#comment-form textarea::placeholder {
+    color: #888; /* Suptilnija boja za placeholder */
+}
+
+#comment-form button {
+    align-self: flex-end;
+    background-color: #28a745; /* Zelena */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+#comment-form button:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+/* Stil za ime korisnika */
+.comment-username {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #ffcc00; /* Zlatna boja */
+}
+
+/* Stil za vremensku oznaku */
+.comment-timestamp {
+    font-size: 0.9rem;
+    color: #bbb; /* Neutralna boja */
+}
+
+/* Stil za zaglavlje komentara */
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.delete-button {
+    margin-left: 10px;
+    background-color: #dc3545; /* Crvena */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.delete-button:hover {
+    background-color: #c82333;
+    transform: scale(1.05);
+}
+#search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: #1c2a3a; /* Tamna pozadina za rezultate */
+    border: 1px solid #444; /* Suptilan obrub */
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    border-radius: 8px; /* Zaobljeni kutovi */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* Suptilna sjena */
+}
+
+#search-results div {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #555; /* Suptilna linija između rezultata */
+    color: #ddd; /* Svijetla boja teksta */
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#search-results div img {
+    width: 50px;
+    height: 75px;
+    border-radius: 5px; /* Lagano zaobljeni rubovi slika */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Suptilna sjena za slike */
+}
+
+#search-results div:hover {
+    background-color: #2c3e50; /* Boja za hover */
+    color: #ffc107; /* Zlatna boja za tekst pri hoveru */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#search-results div:last-child {
+    border-bottom: none;
+}
+
 
 @media (max-width: 1024px) {
     .containerMovie {
@@ -927,6 +1133,20 @@ table tr:hover {
     .dropdown-item {
         font-size: 12px;
         padding: 8px 15px;
+    }
+    #comments-section {
+        padding: 15px;
+    }
+    #comment-form textarea {
+        height: 100px;
+    }
+
+    .comment {
+        padding: 10px;
+    }
+
+    .like-button {
+        padding: 5px 10px;
     }
     
 }

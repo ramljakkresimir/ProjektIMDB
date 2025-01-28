@@ -3,6 +3,81 @@ const url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}`
 const moviesContainer = document.getElementById('movies-container');
 
 document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('search-input');
+    const searchButton = document.getElementById('search-button');
+    const searchResults = document.getElementById('search-results');
+
+    // Event listener za pretraživanje
+    searchButton.addEventListener('click', () => {
+        const query = searchInput.value.trim();
+        if (query) {
+            searchMovies(query);
+        }
+    });
+    // Event listener za Enter u input polju
+    searchInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault(); 
+            const query = searchInput.value.trim();
+            if (query) {
+                searchMovies(query);
+            }
+        }
+    });
+    // Sakrij rezultate ako klik nije unutar dropdown-a i ako kliknemo
+    document.addEventListener('click', (event) => {
+        if (!searchResults.contains(event.target) && event.target !== searchInput) {
+            searchResults.innerHTML = '';
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            searchResults.innerHTML = ''; // Sakrij rezultate pritiskom na Esc
+        }
+    });
+
+    // Funkcija za dohvaćanje filmova iz TMDB API-ja
+    async function searchMovies(query) {
+        try {
+            
+            const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}`);
+            const data = await response.json();
+            displaySearchResults(data.results); // Prikaz rezultata pretraživanja
+        } catch (error) {
+            console.error('Greška prilikom pretraživanja filmova:', error);
+        }
+    }
+
+    // Funkcija za prikaz rezultata pretraživanja
+    function displaySearchResults(results) {
+        searchResults.innerHTML = ''; // Očisti prethodne rezultate
+    
+        if (results.length === 0) {
+            searchResults.innerHTML = '<p style="padding: 10px; color: #ddd;">Nema rezultata za vašu pretragu.</p>';
+            return;
+        }
+    
+        results.forEach(movie => {
+            const resultDiv = document.createElement('div');
+            resultDiv.innerHTML = `
+                <img src="https://image.tmdb.org/t/p/w200${movie.poster_path}" alt="${movie.title}">
+                <div>
+                    <h5 style="margin: 0; font-size: 1.1rem; color: #ffc107;">${movie.title}</h5>
+                    <p style="margin: 0; font-size: 0.9rem; color: #ddd;">${movie.release_date || 'Nepoznat datum'}</p>
+                </div>
+            `;
+            resultDiv.addEventListener('click', () => {
+                // Klik vodi na detalje o filmu
+                window.location.href = `film.html?id=${movie.id}`;
+            });
+            searchResults.appendChild(resultDiv);
+        });
+    }
+    
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
 document.querySelector('#registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -88,6 +163,106 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+document.addEventListener('DOMContentLoaded', () => {
+document.getElementById('comment-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    const movieId = new URLSearchParams(window.location.search).get('id');
+    const commentText = document.getElementById('comment-text').value;
+
+    if (!token) {
+        alert('Morate biti prijavljeni da biste dodali komentar.');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:8000/comments', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+            body: JSON.stringify({ movie_id: movieId, comment: commentText }),
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message);
+            document.getElementById('comment-text').value = '';
+            loadComments(movieId); // Osvježi komentare
+        } else {
+            alert(result.error || 'Došlo je do greške.');
+        }
+    } catch (err) {
+        console.error('Greška prilikom dodavanja komentara:', err);
+    }
+});
+
+document.getElementById('comments-container').addEventListener('click', async (e) => {
+    if (e.target.classList.contains('like-button')) {
+        const token = localStorage.getItem('token');
+        const commentId = e.target.dataset.commentId;
+
+        if (!token) {
+            alert('Morate biti prijavljeni da biste lajkali komentar.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:8000/comments/${commentId}/like`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.message);
+                loadComments(new URLSearchParams(window.location.search).get('id')); // Osvježi komentare
+            } else {
+                alert(result.error || 'Došlo je do greške.');
+            }
+        } catch (err) {
+            console.error('Greška prilikom lajkanja komentara:', err);
+        }
+    }
+    if (e.target.classList.contains('delete-button')) {
+        const token = localStorage.getItem('token');
+        const commentId = e.target.dataset.commentId;
+
+        if (!token) {
+            alert('Morate biti prijavljeni da biste obrisali komentar.');
+            return;
+        }
+
+        const confirmDelete = confirm('Jeste li sigurni da želite obrisati ovaj komentar?');
+        if (!confirmDelete) return;
+
+        try {
+            const response = await fetch(`http://localhost:8000/comments/${commentId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.message);
+                e.target.closest('.comment').remove(); // Ukloni komentar iz DOM-a
+            } else {
+                alert(result.error || 'Došlo je do greške prilikom brisanja komentara.');
+            }
+        } catch (err) {
+            console.error('Greška prilikom brisanja komentara:', err);
+        }
+    }
+    });
+});
+
+
 //watchlist 
 document.addEventListener('DOMContentLoaded', () => {
     const watchlistContainer = document.getElementById('watchlist-container');
@@ -155,7 +330,8 @@ function removeFromWatchlist(movieId) {
         }
     })
     .catch(error => console.error('Greška prilikom uklanjanja:', error));
-    }
+}
+
 
 
 
@@ -163,9 +339,6 @@ function removeFromWatchlist(movieId) {
 document.addEventListener('DOMContentLoaded', () => {
     const moviesGrid = document.getElementById('movies-grid');
     const movieDetails = document.getElementById('movie-details');
-    const reviewsContainer = document.getElementById('reviews-container');
-    const reviewForm = document.getElementById('review-form');
-
     const urlParams = new URLSearchParams(window.location.search);
     const movieId = urlParams.get('id');
 
@@ -205,28 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(error => console.error('Error fetching movie details:', error));
 
-        function loadReviews() {
-            const reviews = JSON.parse(localStorage.getItem(`reviews-${movieId}`)) || [];
-            if (reviewsContainer) {
-                reviewsContainer.innerHTML = reviews.map(review => `<p>${review}</p>`).join('');
-            }
-        }
-
-        if (reviewForm) {
-            reviewForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const reviewText = document.getElementById('review-text').value;
-
-                const reviews = JSON.parse(localStorage.getItem(`reviews-${movieId}`)) || [];
-                reviews.push(reviewText);
-                localStorage.setItem(`reviews-${movieId}`, JSON.stringify(reviews));
-
-                loadReviews();
-                reviewForm.reset();
-            });
-        }
-
-        loadReviews();
+        
     }
 });
 
@@ -576,6 +728,47 @@ function addToWatchlist(movie) {
         alert('Morate se prijaviti da biste dodali u Watchlist!'); // Alert za korisnika koji nije prijavljen
     }
 }
+
+async function loadComments(movieId) {
+    try {
+        const response = await fetch(`http://localhost:8000/comments?movie_id=${movieId}`);
+        const comments = await response.json();
+        console.log('Dohvaćeni komentari:', comments); 
+        const commentsContainer = document.getElementById('comments-container');
+        commentsContainer.innerHTML = '';
+
+        comments.forEach(comment => {
+            const commentElement = document.createElement('div');
+            commentElement.classList.add('comment');
+            commentElement.innerHTML = `
+                <div class="comment-header">
+                    <span class="comment-username">${comment.username}</span>
+                    <span class="comment-timestamp">${new Date(comment.timestamp).toLocaleString()}</span>
+                </div>
+                <p class="comment-text">${comment.comment}</p>
+                <div class="comment-actions">
+                    <button class="like-button" data-comment-id="${comment.id}">
+                        Sviđa mi se (${comment.likes || 0})
+                    </button>
+                    ${comment.isUserComment ? 
+                        `<button class="delete-button" data-comment-id="${comment.id}">Izbriši</button>` 
+                        : ''
+                    }
+                </div>
+            `;
+            commentsContainer.appendChild(commentElement);
+        });
+        
+    } catch (err) {
+        console.error('Greška prilikom dohvaćanja komentara:', err);
+    }
+}
+
+// Učitavanje komentara pri učitavanju stranice
+document.addEventListener('DOMContentLoaded', () => {
+    const movieId = new URLSearchParams(window.location.search).get('id');
+    loadComments(movieId);
+});
 
 
 

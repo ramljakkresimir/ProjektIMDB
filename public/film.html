@@ -7,7 +7,6 @@
     <link rel="icon" type="image/x-icon" href="slike/logo-removebg-preview.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
     <link rel="stylesheet" href="style.css">
     
 </head>
@@ -57,17 +56,21 @@
     <main class="movie-details" id="movie-details">
         <!-- Dinamički sadržaj o filmu bit će ovdje -->
     </main>
-    <section id="reviews-section">
-        <h2>Recenzije</h2>
-        <div id="reviews-container">
-            <!-- Recenzije će se prikazivati ovdje -->
-        </div>
-        <form id="review-form">
-            <textarea id="review-text" placeholder="Napišite svoju recenziju..." required></textarea>
-            <button type="submit">Pošalji recenziju</button>
-        </form>
-    </section>
+    <section id="comments-section">
+      <h2>Komentari</h2>
+      <div id="comments-container" class="comments-list">
+          <!-- Dinamički učitani komentari -->
+      </div>
+      <form id="comment-form" style="display: block;">
+          <textarea id="comment-text" placeholder="Napišite svoj komentar..." required></textarea>
+          <button type="submit">Pošalji komentar</button>
+      </form>
+  </section>
+  
     
-<script src="index.js" charset="utf-8"></script>
+     <script src="index.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

@@ -135,6 +135,146 @@ app.delete('/watchlist/:movie_id', async (req, res) => {
     }
 });
 
+app.post('/comments', async (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ error: 'Niste autorizirani. Prijavite se.' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, 'tajni_kljuc');
+        const { username } = decoded; // Dohvati username iz tokena
+        const { movie_id, comment } = req.body;
+
+        if (!movie_id || !comment) {
+            return res.status(400).json({ error: 'Morate unijeti ID filma i komentar.' });
+        }
+
+        // Dodaj komentar koristeći username
+        await db.none(
+            `INSERT INTO comments (username, movie_id, comment) 
+             VALUES ($1, $2, $3)`,
+            [username, movie_id, comment]
+        );
+
+        res.status(201).json({ message: 'Komentar uspješno dodan!' });
+    } catch (err) {
+        console.error('Greška prilikom dodavanja komentara:', err);
+        res.status(500).json({ error: 'Došlo je do greške prilikom dodavanja komentara.' });
+    }
+});
+
+// Endpoint za dohvaćanje komentara za film
+app.get('/comments', async (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    let username = null;
+
+    if (token) {
+        try {
+            const decoded = jwt.verify(token, 'tajni_kljuc');
+            username = decoded.username;
+        } catch (err) {
+            console.error('Neispravan token:', err);
+        }
+    }
+
+    const { movie_id } = req.query;
+
+    if (!movie_id) {
+        return res.status(400).json({ error: 'ID filma je obavezan.' });
+    }
+
+    try {
+        const comments = await db.any(
+            `SELECT c.id, c.comment, c.timestamp, c.username,
+       (SELECT COUNT(*) FROM comment_likes WHERE comment_id = c.id) AS likes,
+       CASE WHEN c.username = $2 THEN TRUE ELSE FALSE END AS "isUserComment"
+FROM comments c
+WHERE c.movie_id = $1
+ORDER BY c.timestamp DESC; `,
+            [movie_id, username]
+        );
+
+        res.status(200).json(comments);
+    } catch (err) {
+        console.error('Greška prilikom dohvaćanja komentara:', err);
+        res.status(500).json({ error: 'Došlo je do greške prilikom dohvaćanja komentara.' });
+    }
+});
+
+
+// Endpoint za lajkanje komentara
+app.post('/comments/:id/like', async (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ error: 'Niste autorizirani. Prijavite se.' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, 'tajni_kljuc');
+        const { username } = decoded; // Dohvati username iz tokena
+        const { id: comment_id } = req.params;
+
+        // Provjera je li korisnik već lajkao komentar
+        const existingLike = await db.oneOrNone(
+            `SELECT * FROM comment_likes 
+             WHERE comment_id = $1 AND username = $2`,
+            [comment_id, username]
+        );
+
+        if (existingLike) {
+            return res.status(400).json({ error: 'Već ste lajkali ovaj komentar.' });
+        }
+
+        // Dodaj lajk za komentar
+        await db.none(
+            `INSERT INTO comment_likes (comment_id, username) 
+             VALUES ($1, $2)`,
+            [comment_id, username]
+        );
+
+        res.status(200).json({ message: 'Komentar uspješno lajkan!' });
+    } catch (err) {
+        console.error('Greška prilikom lajkanja komentara:', err);
+        res.status(500).json({ error: 'Došlo je do greške prilikom lajkanja komentara.' });
+    }
+});
+app.delete('/comments/:id', async (req, res) => {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ error: 'Niste autorizirani. Prijavite se.' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, 'tajni_kljuc');
+        const { username } = decoded; // Dohvati username iz tokena
+        const { id: comment_id } = req.params;
+
+        // Provjera je li korisnik autor komentara
+        const comment = await db.oneOrNone(
+            `SELECT c.id 
+             FROM comments c
+             WHERE c.id = $1 AND c.username = $2`,
+            [comment_id, username]
+        );
+
+        if (!comment) {
+            return res.status(403).json({ error: 'Nemate pravo brisati ovaj komentar.' });
+        }
+
+        // Brisanje komentara iz baze
+        await db.none('DELETE FROM comments WHERE id = $1', [comment_id]);
+
+        res.status(200).json({ message: 'Komentar je uspješno obrisan.' });
+    } catch (err) {
+        console.error('Greška prilikom brisanja komentara:', err);
+        res.status(500).json({ error: 'Došlo je do greške prilikom brisanja komentara.' });
+    }
+});
+
 
 // Pokretanje servera
 const PORT = 8000;
