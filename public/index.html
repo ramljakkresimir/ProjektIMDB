@@ -13,7 +13,7 @@
 <body>
     <!--header -->
     <nav class="navbar navbar-expand-lg navbar-dark d-flex align-items-center">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="index.html">
           <img src="slike/logo-removebg-preview.png" alt="Logo">
         </a>
         
@@ -49,9 +49,9 @@
             <span id="username-placeholder">Korisnik</span>
             </button>
             <div class="dropdown-menu" aria-labelledby="userDropdown">
-                <a class="dropdown-item" href="#">Uredi profil</a>
-                <a class="dropdown-item" href="#">Postavke</a>
-                <a class="dropdown-item" href="#" id="logout-button">Odjavi se</a>
+                <a class="dropdown-item" href="admin.html" id="admin-panel-item" style="display: none;">Admin Panel</a>
+                <a class="dropdown-item" class="dropdown-item" href="profil.html">Moj profil</a>
+                <a class="dropdown-item" class="dropdown-item" href="login.html" id="logout-button">Odjavi se</a>
             </div>
         </div>
 
@@ -97,7 +97,7 @@
       <div class="actors-slider">
           <button class="arrow left-arrow" onclick="leftArrowActors()">&#10094;</button>
           <div class="actors-container" id="actors-container">
-              <!-- Glumci će se dinamički dodati ovdje -->
+              
           </div>
           <button class="arrow right-arrow" onclick="rightArrowActors()">&#10095;</button>
       </div>

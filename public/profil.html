@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Review Homepage</title>
+    <link rel="icon" type="image/x-icon" href="slike/logo-removebg-preview.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+    <!--header -->
+    <nav class="navbar navbar-expand-lg navbar-dark d-flex align-items-center">
+        <a class="navbar-brand" href="index.html">
+          <img src="slike/logo-removebg-preview.png" alt="Logo">
+        </a>
+        
+        <!-- search za smanjenu sirinu -->
+        <form class="search-bar mx-3 flex-grow-1">
+            <input type="text" id="search-input" class="form-control" placeholder="Pretraži...">
+            <button id="search-button" class="btn" type="button">Pretraži</button>
+        </form>
+        <div id="search-results"></div>
+        
+      
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon" style="color: #ffc107;"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse ml-auto" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="filmovi.html">Filmovi</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="serije.html">TV serije</a>
+            </li>
+            <li class="nav-item" id="watchlist-item" style="display: none;">
+                <a class="nav-link" href="watchlist.html">Watchlist</a>
+              </li>
+          </ul>
+        </div>
+      
+        <a href="login.html" class="btn btn-login ml-2" id="login-button">Prijavi se</a>
+        <div id="user-menu" style="display: none;">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span id="username-placeholder">Korisnik</span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="userDropdown">
+                <a class="dropdown-item" href="admin.html" id="admin-panel-item" style="display: none;">Admin Panel</a>
+                <a class="dropdown-item" class="dropdown-item" href="profil.html">Moj profil</a>
+                <a class="dropdown-item" class="dropdown-item" href="login.html" id="logout-button">Odjavi se</a>
+            </div>
+        </div>
+
+            
+      </nav>
+    <!-- Profil -->
+    <section class="profile-section">
+        <div class="profile-container">
+            <h1>Moj Profil</h1>
+            <div class="profile-info">
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label for="username">Korisničko ime:</label>
+                        <input type="text" id="username" name="username" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="bio">O meni:</label>
+                        <textarea id="bio" name="bio" placeholder="Napišite nešto o sebi..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-save">Spremi promjene</button>
+                </form>
+            </div>
+            <div class="profile-comments">
+                <h2>Moji komentari</h2>
+                <div id="comments-list">
+                    <!-- Komentari -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="slike/logo-removebg-preview.png" alt="Filmopedia Logo" class="logo-footer">
+            </div>
+            <div class="footer-social">
+                <a href="https://www.facebook.com" target="_blank" class="social-icon">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="https://www.twitter.com" target="_blank" class="social-icon">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="https://www.instagram.com" target="_blank" class="social-icon">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://www.linkedin.com" target="_blank" class="social-icon">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
+            </div>
+            <div class="footer-info">
+                <p>&copy; 2024 Filmopedia. Sva prava pridržana.</p>
+                <p><a href="#">Uvjeti korištenja</a> | <a href="#">Privatnost</a></p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem('token');
+            const usernamePlaceholder = document.getElementById('username-placeholder');
+            const usernameInput = document.getElementById('username');
+            const bioInput = document.getElementById('bio');
+            const profileForm = document.getElementById('profile-form');
+            const commentsList = document.getElementById('comments-list');
+        
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+        
+            const userData = JSON.parse(atob(token.split('.')[1]));
+            usernamePlaceholder.textContent = userData.username;
+            usernameInput.value = userData.username;
+        
+            loadProfileData(userData.username);
+            loadUserComments(userData.username);
+        
+            profileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const bio = bioInput.value;
+        
+                try {
+                    const response = await fetch('http://localhost:8000/update-profile', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({ bio })
+                    });
+        
+                    if (!response.ok) {
+                        throw new Error('Greška pri spremanju podataka');
+                    }
+        
+                    alert('Profil ažuriran!');
+                } catch (err) {
+                    console.error('Greška:', err);
+                    alert('Došlo je do greške prilikom spremanja podataka.');
+                }
+            });
+        
+            async function loadProfileData(username) {
+                try {
+                    const response = await fetch(`http://localhost:8000/profile?username=${username}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+        
+                    if (!response.ok) throw new Error('Greška pri dohvatu podataka');
+        
+                    const data = await response.json();
+                    bioInput.value = data.bio || '';
+                } catch (err) {
+                    console.error('Greška:', err);
+                }
+            }
+
+            async function loadUserComments(username) {
+                try {
+                    const response = await fetch(`http://localhost:8000/user-comments?username=${username}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+        
+                    if (!response.ok) throw new Error('Greška pri dohvatu komentara');
+        
+                    const comments = await response.json();
+                    commentsList.innerHTML = comments.map(comment => `
+                        <div class="comment-item">
+                            <div class="comment-header">
+                                <span class="comment-username">${comment.username}</span>
+                                <span class="comment-timestamp">${new Date(comment.timestamp).toLocaleString()}</span>
+                            </div>
+                            <p class="comment-text">${comment.comment}</p>
+                        </div>
+                    `).join('');
+                } catch (err) {
+                    console.error('Greška:', err);
+                }
+            }
+        });
+document.addEventListener('DOMContentLoaded', () => {
+const loginButton = document.getElementById('login-button');
+const userMenu = document.getElementById('user-menu');
+const usernamePlaceholder = document.getElementById('username-placeholder');
+const logoutButton = document.getElementById('logout-button');
+const watchlistItem = document.getElementById('watchlist-item');
+const adminPanelItem = document.getElementById('admin-panel-item'); 
+
+const token = localStorage.getItem('token');
+if (token) {
+    try {
+        const userData = JSON.parse(atob(token.split('.')[1])); 
+        usernamePlaceholder.textContent = userData.username; 
+
+        if (userData.role === 'admin') {
+            adminPanelItem.style.display = 'block'; 
+        }
+
+        loginButton.style.display = 'none';
+        userMenu.style.display = 'block';
+        watchlistItem.style.display = 'block';
+    } catch (error) {
+        console.error('Greška prilikom dekodiranja tokena:', error);
+        localStorage.removeItem('token');
+    }
+} else {
+    watchlistItem.style.display = 'none';
+}
+
+logoutButton.addEventListener('click', () => {
+    localStorage.removeItem('token');
+    location.reload();
+});
+});
+        </script>
+</body>
+</html>

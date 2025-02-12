@@ -3,23 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalji</title>
+    <title>Movie Review Homepage</title>
     <link rel="icon" type="image/x-icon" href="slike/logo-removebg-preview.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    
 </head>
 <body>
+    <!--header -->
     <nav class="navbar navbar-expand-lg navbar-dark d-flex align-items-center">
         <a class="navbar-brand" href="index.html">
-          <img src="slike/logo-removebg-preview.png" alt="Logo"> 
+          <img src="slike/logo-removebg-preview.png" alt="Logo">
         </a>
         
-        <!-- Search za smanjenu širinu -->
+        <!-- search za smanjenu sirinu -->
         <form class="search-bar mx-3 flex-grow-1">
-          <input type="text" class="form-control" placeholder="Pretraži...">
-          <button class="btn" type="button">Pretraži</button>
+            <input type="text" id="search-input" class="form-control" placeholder="Pretraži...">
+            <button id="search-button" class="btn" type="button">Pretraži</button>
         </form>
+        <div id="search-results"></div>
+        
       
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon" style="color: #ffc107;"></span>
@@ -34,8 +38,8 @@
               <a class="nav-link" href="serije.html">TV serije</a>
             </li>
             <li class="nav-item" id="watchlist-item" style="display: none;">
-              <a class="nav-link" href="watchlist.html">Watchlist</a>
-            </li>
+                <a class="nav-link" href="watchlist.html">Watchlist</a>
+              </li>
           </ul>
         </div>
       
@@ -45,25 +49,25 @@
             <span id="username-placeholder">Korisnik</span>
             </button>
             <div class="dropdown-menu" aria-labelledby="userDropdown">
-                <a class="dropdown-item" href="#">Uredi profil</a>
-                <a class="dropdown-item" href="#">Postavke</a>
-                <a class="dropdown-item" href="#" id="logout-button">Odjavi se</a>
+                <a class="dropdown-item" href="admin.html" id="admin-panel-item" style="display: none;">Admin Panel</a>
+                <a class="dropdown-item" class="dropdown-item" href="profil.html">Moj profil</a>
+                <a class="dropdown-item" class="dropdown-item" href="login.html" id="logout-button">Odjavi se</a>
             </div>
         </div>
-    </nav>
+      </nav>
     <main class="series-details" id="series-details">
-        <!-- Dinamički sadržaj o seriji bit će ovdje -->
+        <!-- Sadrzaj o seriji -->
     </main>
-    <section id="reviews-section">
-        <h2>Recenzije</h2>
-        <div id="reviews-container">
-            <!-- Recenzije će se prikazivati ovdje -->
-        </div>
-        <form id="review-form">
-            <textarea id="review-text" placeholder="Napišite svoju recenziju..." required></textarea>
-            <button type="submit">Pošalji recenziju</button>
-        </form>
-    </section>
+    <section id="comments-section">
+      <h2>Komentari</h2>
+      <div id="comments-container" class="comments-list">
+          <!-- Komentari -->
+      </div>
+      <form id="comment-form" style="display: block;">
+          <textarea id="comment-text" placeholder="Napišite svoj komentar..." required></textarea>
+          <button type="submit">Pošalji komentar</button>
+      </form>
+  </section>
     
     
     <script src="index.js" charset="utf-8"></script>

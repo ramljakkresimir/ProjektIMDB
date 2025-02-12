@@ -1,0 +1,243 @@
+<!-- admin.html -->
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .nav { margin-bottom: 20px; }
+        .nav button { margin-right: 10px; padding: 5px 15px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .banned { background-color: #ffe6e6; }
+        button { cursor: pointer; padding: 3px 8px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <button onclick="showSection('users')">Korisnici</button>
+        <button onclick="showSection('comments')">Komentari</button>
+    </div>
+
+    <!-- Korisnici -->
+    <div id="users-section">
+        <h2>Admin Panel - Lista korisnika</h2>
+        <div id="message"></div>
+        <table id="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Korisničko ime</th>
+                    <th>Email</th>
+                    <th>Uloga</th>
+                    <th>Status</th>
+                    <th>Radnje</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <!-- Komentari -->
+    <div id="comments-section" style="display: none;">
+        <h2>Svi komentari</h2>
+        <div id="comments-message"></div>
+        <table id="comments-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Korisnik</th>
+                    <th>Komentar</th>
+                    <th>Datum</th>
+                    <th>Radnje</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login.html';
+                return;
+            }
+
+            try {
+                const decoded = parseJwt(token);
+                if (decoded.role !== 'admin') {
+                    window.location.href = '/';
+                } else {
+                    loadUsers();
+                    loadComments();
+                }
+            } catch (error) {
+                window.location.href = '/login.html';
+            }
+        });
+
+        function showSection(section) {
+            document.getElementById('users-section').style.display = 
+                section === 'users' ? 'block' : 'none';
+            document.getElementById('comments-section').style.display = 
+                section === 'comments' ? 'block' : 'none';
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/admin/users', {
+                    headers: getAuthHeader()
+                });
+                
+                if (!response.ok) throw new Error('Greška pri dohvatu korisnika');
+                
+                const users = await response.json();
+                const tbody = document.querySelector('#users-table tbody');
+                tbody.innerHTML = '';
+
+                users.forEach(user => {
+                    const row = document.createElement('tr');
+                    if (user.banned) row.classList.add('banned');
+                    
+                    row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.username}</td>
+                        <td>${user.email}</td>
+                        <td>
+                            <select onchange="updateRole('${user.username}', this.value)">
+                                <option ${user.role === 'user' ? 'selected' : ''}>user</option>
+                                <option ${user.role === 'admin' ? 'selected' : ''}>admin</option>
+                            </select>
+                        </td>
+                        <td>${user.banned ? 'BANOVAN' : 'AKTIVAN'}</td>
+                        <td>
+                            ${user.banned ? 
+                                `<button onclick="unbanUser('${user.username}')">Ukini ban</button>` :
+                                `<button onclick="banUser('${user.username}')">Banuj</button>`}
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                showMessage('error', error.message);
+            }
+        }
+
+        async function updateRole(username, newRole) {
+            try {
+                const response = await fetch(`/admin/role/${username}`, {
+                    method: 'PUT',
+                    headers: getAuthHeader(),
+                    body: JSON.stringify({ role: newRole })
+                });
+
+                if (!response.ok) throw new Error('Greška pri promjeni uloge');
+                
+                showMessage('success', 'Uloga uspješno ažurirana');
+                loadUsers();
+            } catch (error) {
+                showMessage('error', error.message);
+            }
+        }
+
+        async function banUser(username) {
+            await toggleBan(username, 'ban');
+        }
+
+        async function unbanUser(username) {
+            await toggleBan(username, 'unban');
+        }
+
+        async function toggleBan(username, action) {
+            try {
+                const endpoint = action === 'ban' ? 'ban' : 'unban';
+                const response = await fetch(`/admin/${endpoint}/${username}`, {
+                    method: 'POST',
+                    headers: getAuthHeader()
+                });
+
+                if (!response.ok) throw new Error(`Greška pri ${action} korisnika`);
+                
+                showMessage('success', `Korisnik ${action === 'ban' ? 'banovan' : 'debanovan'}`);
+                loadUsers();
+            } catch (error) {
+                showMessage('error', error.message);
+            }
+        }
+
+        async function loadComments() {
+            try {
+                const response = await fetch('/admin/comments', {
+                    headers: getAuthHeader()
+                });
+                
+                const comments = await response.json();
+                const tbody = document.querySelector('#comments-table tbody');
+                tbody.innerHTML = '';
+
+                comments.forEach(comment => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${comment.id}</td>
+                        <td>${comment.username}</td>
+                        <td>${comment.comment}</td>
+                        <td>${new Date(comment.timestamp).toLocaleString()}</td>
+                        <td>
+                            <button onclick="deleteComment(${comment.id})">Obriši</button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                showMessage('comments-error', error.message);
+            }
+        }
+async function deleteComment(commentId) {
+    try {
+        const response = await fetch(`/comments/${commentId}`, {
+            method: 'DELETE',
+            headers: getAuthHeader()
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+            const errorMsg = data.error || `HTTP greška ${response.status}`;
+            throw new Error(errorMsg);
+        }
+
+        showMessage('success', 'Komentar uspješno obrisan');
+        loadComments();
+    } catch (error) {
+        console.error('Greška pri brisanju:', error);
+        showMessage('error', error.message);
+        if (error.message.includes('401') || error.message.includes('403')) {
+            localStorage.removeItem('token');
+            window.location.href = '/login.html';
+        }
+    }
+}
+
+        function getAuthHeader() {
+            const token = localStorage.getItem('token');
+            return { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' };
+        }
+
+        function parseJwt(token) {
+            return JSON.parse(atob(token.split('.')[1]));
+        }
+
+        function showMessage(type, text) {
+            const div = document.getElementById('message');
+            div.className = type;
+            div.textContent = text;
+            setTimeout(() => div.textContent = '', 3000);
+        }
+    </script>
+</body>
+</html>

@@ -295,26 +295,26 @@ footer {
 
 .sidebar {
     width: 20%;
-    background-color: #2c3e50; /* Modernija boja */
-    color: #ecf0f1; /* Svjetlija boja teksta za kontrast */
+    background-color: #2c3e50; 
+    color: #ecf0f1;
     padding: 20px;
     border-radius: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Suptilan efekt sjene */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
 }
 
 .sidebar h2 {
-    font-size: 1.5rem; /* Veći naslov */
+    font-size: 1.5rem; 
     font-weight: bold;
     margin-bottom: 20px;
-    color: #ffd700; /* Zlatna boja za isticanje */
-    border-bottom: 2px solid #ffd700; /* Linija ispod naslova */
+    color: #ffd700; 
+    border-bottom: 2px solid #ffd700;
     padding-bottom: 10px;
 }
 
 .sidebar label {
     font-size: 1rem;
     margin-top: 10px;
-    display: block; /* Kako bi svaki label bio na novom redu */
+    display: block;
     color: #ecf0f1;
     font-weight: bold;
 }
@@ -733,7 +733,7 @@ table tr:hover {
 
 
 #login-button:hover {
-    background-color: #e0a800; /* Tamnija zlatna za hover */
+    background-color: #e0a800;
 }
 
 /* Stil za korisnički meni */
@@ -742,7 +742,7 @@ table tr:hover {
 }
 
 #userDropdown {
-    background-color: #343a40; /* Tamna boja */
+    background-color: #343a40; 
     color: #fff;
     border: none;
     padding: 10px 20px;
@@ -756,7 +756,7 @@ table tr:hover {
 }
 
 #userDropdown:hover {
-    background-color: #23272b; /* Tamnija boja za hover */
+    background-color: #23272b; 
 }
 
 /* Padajući meni */
@@ -764,17 +764,17 @@ table tr:hover {
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: #343a40; /* Tamna pozadina */
+    background-color: #343a40; 
     border: none;
     border-radius: 5px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     margin-top: 5px;
     padding: 10px 0;
-    display: none; /* Sakriveno dok nije aktivno */
+    display: none; 
 }
 
 #userDropdown[aria-expanded="true"] + .dropdown-menu {
-    display: block; /* Prikaži padajući meni kada je dugme aktivno */
+    display: block; 
 }
 
 /* Stavke u padajućem meniju */
@@ -788,7 +788,7 @@ table tr:hover {
 }
 
 .dropdown-item:hover {
-    background-color: #495057; /* Hover efekat */
+    background-color: #495057;
     color: #fff;
 }
 
@@ -851,8 +851,8 @@ table tr:hover {
     padding: 20px;
     max-width: 800px;
     border-top: 2px solid #444;
-    background-color: #222; /* Tamna pozadina */
-    color: #ddd; /* Svijetli tekst */
+    background-color: #222;
+    color: #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
@@ -861,20 +861,18 @@ table tr:hover {
     text-align: center;
     margin-bottom: 20px;
     font-size: 2rem;
-    color: #ffcc00; /* Zlatna boja za isticanje */
+    color: #ffcc00;
     font-weight: bold;
 }
-
 /* List of comments */
 .comments-list {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
-
 /* Individual comment card */
 .comment {
-    background-color: #333; /* Tamnija pozadina za komentare */
+    background-color: #333; 
     border: 1px solid #555;
     border-radius: 8px;
     padding: 15px;
@@ -898,12 +896,12 @@ table tr:hover {
 .comment-username {
     font-weight: bold;
     font-size: 1rem;
-    color: #ffcc00; /* Zlatna za korisničko ime */
+    color: #ffcc00; 
 }
 
 .comment-timestamp {
     font-size: 0.9rem;
-    color: #bbb; /* Neutralna za datum/vrijeme */
+    color: #bbb; 
 }
 
 /* Text of the comment */
@@ -916,7 +914,7 @@ table tr:hover {
 /* Like button */
 .like-button {
     margin-top: 10px;
-    background-color: #007bff; /* Plava */
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
@@ -936,7 +934,7 @@ table tr:hover {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    background-color: #333; /* Tamna pozadina */
+    background-color: #333;
     padding: 15px;
     border-radius: 8px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
@@ -949,18 +947,18 @@ table tr:hover {
     border-radius: 5px;
     padding: 10px;
     font-size: 1rem;
-    background-color: #222; /* Tamna pozadina */
-    color: #ddd; /* Svijetli tekst */
+    background-color: #222; 
+    color: #ddd; 
     resize: none;
 }
 
 #comment-form textarea::placeholder {
-    color: #888; /* Suptilnija boja za placeholder */
+    color: #888; 
 }
 
 #comment-form button {
     align-self: flex-end;
-    background-color: #28a745; /* Zelena */
+    background-color: #28a745; 
     color: white;
     border: none;
     border-radius: 5px;
@@ -978,16 +976,15 @@ table tr:hover {
 .comment-username {
     font-weight: bold;
     font-size: 1rem;
-    color: #ffcc00; /* Zlatna boja */
+    color: #ffcc00; 
 }
 
 /* Stil za vremensku oznaku */
 .comment-timestamp {
     font-size: 0.9rem;
-    color: #bbb; /* Neutralna boja */
+    color: #bbb; 
 }
 
-/* Stil za zaglavlje komentara */
 .comment-header {
     display: flex;
     justify-content: space-between;
@@ -996,7 +993,7 @@ table tr:hover {
 }
 .delete-button {
     margin-left: 10px;
-    background-color: #dc3545; /* Crvena */
+    background-color: #dc3545;
     color: white;
     border: none;
     border-radius: 5px;
@@ -1014,20 +1011,20 @@ table tr:hover {
     top: 100%;
     left: 0;
     width: 100%;
-    background-color: #1c2a3a; /* Tamna pozadina za rezultate */
-    border: 1px solid #444; /* Suptilan obrub */
+    background-color: #1c2a3a; 
+    border: 1px solid #444; 
     z-index: 1000;
     max-height: 300px;
     overflow-y: auto;
-    border-radius: 8px; /* Zaobljeni kutovi */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* Suptilna sjena */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); 
 }
 
 #search-results div {
     padding: 10px;
     cursor: pointer;
-    border-bottom: 1px solid #555; /* Suptilna linija između rezultata */
-    color: #ddd; /* Svijetla boja teksta */
+    border-bottom: 1px solid #555; 
+    color: #ddd;
     font-size: 1rem;
     display: flex;
     align-items: center;
@@ -1037,34 +1034,141 @@ table tr:hover {
 #search-results div img {
     width: 50px;
     height: 75px;
-    border-radius: 5px; /* Lagano zaobljeni rubovi slika */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* Suptilna sjena za slike */
+    border-radius: 5px; 
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 #search-results div:hover {
-    background-color: #2c3e50; /* Boja za hover */
-    color: #ffc107; /* Zlatna boja za tekst pri hoveru */
+    background-color: #2c3e50;
+    color: #ffc107; 
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #search-results div:last-child {
     border-bottom: none;
 }
+/* Profil Section */
+.profile-section {
+    padding: 40px 20px;
+    background-color: #121212;
+    color: #ffffff;
+}
 
+.profile-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #1c1c1c;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.profile-container h1 {
+    text-align: center;
+    color: #ffc107;
+    margin-bottom: 20px;
+}
+
+.profile-info {
+    margin-bottom: 40px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 5px;
+    color: #ffc107;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    height: 150px;
+    resize: vertical;
+}
+
+.btn-save {
+    background-color: #ffc107;
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-save:hover {
+    background-color: #e0a800;
+}
+
+.profile-comments h2 {
+    color: #ffc107;
+    margin-bottom: 20px;
+}
+
+#comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.comment-item {
+    background-color: #2a2a2a;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #555;
+}
+
+.comment-item .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.comment-item .comment-username {
+    font-weight: bold;
+    color: #ffc107;
+}
+
+.comment-item .comment-timestamp {
+    font-size: 0.9rem;
+    color: #bbb;
+}
+
+.comment-item .comment-text {
+    font-size: 1rem;
+    color: #ffffff;
+}
 
 @media (max-width: 1024px) {
     .containerMovie {
-        flex-direction: column; /* Sidebar i glavni sadržaj jedan ispod drugog */
+        flex-direction: column; 
     }
 
     .sidebar {
-        width: 100%; /* Sidebar zauzima cijelu širinu */
-        margin-bottom: 20px; /* Razmak ispod sidebar-a */
+        width: 100%;
+        margin-bottom: 20px;
     }
 
     .movies-main {
         width: 100%;
-        grid-template-columns: repeat(3, 1fr); /* Prikaz 3 filma po redu */
+        grid-template-columns: repeat(3, 1fr); 
     }
 
     .movie-item img {
@@ -1095,7 +1199,7 @@ table tr:hover {
           text-align: center;
         }
     .containerMovie {
-        flex-direction: column; /* Sidebar ispod glavnog sadržaja */
+        flex-direction: column;
     }
 
     .sidebar {

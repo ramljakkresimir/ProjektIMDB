@@ -2,6 +2,8 @@ const apiKey = '83e3c9dd3e6c9629df9e8f2c03312a72';
 const url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}`;
 const moviesContainer = document.getElementById('movies-container');
 
+
+//search
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('search-input');
     const searchButton = document.getElementById('search-button');
@@ -36,21 +38,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Funkcija za dohvaćanje filmova iz TMDB API-ja
     async function searchMovies(query) {
         try {
             
             const response = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(query)}`);
             const data = await response.json();
-            displaySearchResults(data.results); // Prikaz rezultata pretraživanja
+            displaySearchResults(data.results);
         } catch (error) {
             console.error('Greška prilikom pretraživanja filmova:', error);
         }
     }
 
-    // Funkcija za prikaz rezultata pretraživanja
     function displaySearchResults(results) {
-        searchResults.innerHTML = ''; // Očisti prethodne rezultate
+        searchResults.innerHTML = '';
     
         if (results.length === 0) {
             searchResults.innerHTML = '<p style="padding: 10px; color: #ddd;">Nema rezultata za vašu pretragu.</p>';
@@ -67,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             resultDiv.addEventListener('click', () => {
-                // Klik vodi na detalje o filmu
                 window.location.href = `film.html?id=${movie.id}`;
             });
             searchResults.appendChild(resultDiv);
@@ -77,6 +76,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+
+//registracija i login
 document.addEventListener('DOMContentLoaded', () => {
 document.querySelector('#registerForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -95,7 +96,7 @@ document.querySelector('#registerForm').addEventListener('submit', async (e) => 
 
         if (response.ok) {
             alert(result.message);
-            window.location.href = 'login.html'; // Preusmjeri na početnu stranicu
+            window.location.href = 'login.html';
         } else {
             alert(result.error || 'Došlo je do greške.');
         }
@@ -120,10 +121,9 @@ document.querySelector('#loginForm').addEventListener('submit', async (e) => {
         const result = await response.json();
 
         if (response.ok) {
-            // Sačuvaj token u localStorage
             localStorage.setItem('token', result.token);
             alert(result.message);
-            window.location.href = 'index.html'; // Preusmjeri na početnu stranicu
+            window.location.href = 'index.html';
         } else {
             alert(result.error || 'Došlo je do greške.');
         }
@@ -133,6 +133,8 @@ document.querySelector('#loginForm').addEventListener('submit', async (e) => {
     }
 });
 
+
+//dropdown izbornik ako smo logirani
 });   
 document.addEventListener('DOMContentLoaded', () => {
     const loginButton = document.getElementById('login-button');
@@ -140,13 +142,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const usernamePlaceholder = document.getElementById('username-placeholder');
     const logoutButton = document.getElementById('logout-button');
     const watchlistItem = document.getElementById('watchlist-item');
+    const adminPanelItem = document.getElementById('admin-panel-item');
 
-    // Provera tokena u localStorage
     const token = localStorage.getItem('token');
     if (token) {
         try {
-            const userData = JSON.parse(atob(token.split('.')[1])); // Dekodiraj JWT
-            usernamePlaceholder.textContent = userData.username; // Postavi ime korisnika
+            const userData = JSON.parse(atob(token.split('.')[1]));
+            usernamePlaceholder.textContent = userData.username;
+
+            if (userData.role === 'admin') {
+                adminPanelItem.style.display = 'block';
+            }
+
             loginButton.style.display = 'none';
             userMenu.style.display = 'block';
             watchlistItem.style.display = 'block';
@@ -157,112 +164,116 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         watchlistItem.style.display = 'none';
     }
+
     logoutButton.addEventListener('click', () => {
         localStorage.removeItem('token');
         location.reload();
     });
 });
 
+
+
+//komentari
 document.addEventListener('DOMContentLoaded', () => {
-document.getElementById('comment-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const token = localStorage.getItem('token');
-    const movieId = new URLSearchParams(window.location.search).get('id');
-    const commentText = document.getElementById('comment-text').value;
-
-    if (!token) {
-        alert('Morate biti prijavljeni da biste dodali komentar.');
-        return;
-    }
-
-    try {
-        const response = await fetch('http://localhost:8000/comments', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            },
-            body: JSON.stringify({ movie_id: movieId, comment: commentText }),
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-            alert(result.message);
-            document.getElementById('comment-text').value = '';
-            loadComments(movieId); // Osvježi komentare
-        } else {
-            alert(result.error || 'Došlo je do greške.');
-        }
-    } catch (err) {
-        console.error('Greška prilikom dodavanja komentara:', err);
-    }
-});
-
-document.getElementById('comments-container').addEventListener('click', async (e) => {
-    if (e.target.classList.contains('like-button')) {
+    document.getElementById('comment-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+    
         const token = localStorage.getItem('token');
-        const commentId = e.target.dataset.commentId;
-
+        const movieId = new URLSearchParams(window.location.search).get('id');
+        const commentText = document.getElementById('comment-text').value;
+    
         if (!token) {
-            alert('Morate biti prijavljeni da biste lajkali komentar.');
+            alert('Morate biti prijavljeni da biste dodali komentar.');
             return;
         }
-
+    
         try {
-            const response = await fetch(`http://localhost:8000/comments/${commentId}/like`, {
+            const response = await fetch('http://localhost:8000/comments', {
                 method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`,
                 },
+                body: JSON.stringify({ movie_id: movieId, comment: commentText }),
             });
-
+    
             const result = await response.json();
             if (response.ok) {
                 alert(result.message);
-                loadComments(new URLSearchParams(window.location.search).get('id')); // Osvježi komentare
+                document.getElementById('comment-text').value = '';
+                loadComments(movieId);
             } else {
                 alert(result.error || 'Došlo je do greške.');
             }
         } catch (err) {
-            console.error('Greška prilikom lajkanja komentara:', err);
+            console.error('Greška prilikom dodavanja komentara:', err);
         }
-    }
-    if (e.target.classList.contains('delete-button')) {
-        const token = localStorage.getItem('token');
-        const commentId = e.target.dataset.commentId;
-
-        if (!token) {
-            alert('Morate biti prijavljeni da biste obrisali komentar.');
-            return;
-        }
-
-        const confirmDelete = confirm('Jeste li sigurni da želite obrisati ovaj komentar?');
-        if (!confirmDelete) return;
-
-        try {
-            const response = await fetch(`http://localhost:8000/comments/${commentId}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-
-            const result = await response.json();
-            if (response.ok) {
-                alert(result.message);
-                e.target.closest('.comment').remove(); // Ukloni komentar iz DOM-a
-            } else {
-                alert(result.error || 'Došlo je do greške prilikom brisanja komentara.');
-            }
-        } catch (err) {
-            console.error('Greška prilikom brisanja komentara:', err);
-        }
-    }
     });
-});
-
-
+    
+    document.getElementById('comments-container').addEventListener('click', async (e) => {
+        if (e.target.classList.contains('like-button')) {
+            const token = localStorage.getItem('token');
+            const commentId = e.target.dataset.commentId;
+    
+            if (!token) {
+                alert('Morate biti prijavljeni da biste lajkali komentar.');
+                return;
+            }
+    
+            try {
+                const response = await fetch(`http://localhost:8000/comments/${commentId}/like`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+    
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                    loadComments(new URLSearchParams(window.location.search).get('id'));
+                } else {
+                    alert(result.error || 'Došlo je do greške.');
+                }
+            } catch (err) {
+                console.error('Greška prilikom lajkanja komentara:', err);
+            }
+        }
+        if (e.target.classList.contains('delete-button')) {
+            const token = localStorage.getItem('token');
+            const commentId = e.target.dataset.commentId;
+    
+            if (!token) {
+                alert('Morate biti prijavljeni da biste obrisali komentar.');
+                return;
+            }
+    
+            const confirmDelete = confirm('Jeste li sigurni da želite obrisati ovaj komentar?');
+            if (!confirmDelete) return;
+    
+            try {
+                const response = await fetch(`http://localhost:8000/comments/${commentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                    },
+                });
+    
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                    e.target.closest('.comment').remove();
+                } else {
+                    alert(result.error || 'Došlo je do greške prilikom brisanja komentara.');
+                }
+            } catch (err) {
+                console.error('Greška prilikom brisanja komentara:', err);
+            }
+        }
+        });
+    });
+    
+    
 //watchlist 
 document.addEventListener('DOMContentLoaded', () => {
     const watchlistContainer = document.getElementById('watchlist-container');
@@ -309,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function removeFromWatchlist(movieId) {
-    const token = localStorage.getItem('token'); // jwt token
+    const token = localStorage.getItem('token');
 
     fetch(`http://localhost:8000/watchlist/${movieId}`, {
         method: 'DELETE',
@@ -343,7 +354,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const movieId = urlParams.get('id');
 
     if (movieId) {
-        // Dohvati podatke o filmu
         fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiKey}&language=hr`)
             .then(response => response.json())
             .then(data => {
@@ -362,17 +372,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
 
-                    // Dodavanje na Watchlist
                     const addToWatchlistButton = document.getElementById('add-to-watchlist');
                     addToWatchlistButton.addEventListener('click', () => {
                         const item = {
                             id: data.id,
-                            title: data.title, // Naziv filma
+                            title: data.title,
                             poster_path: data.poster_path,
                             release_date: data.release_date,
                             overview: data.overview
                         };
-                        addToWatchlist(item); // Poziva funkciju za dodavanje
+                        addToWatchlist(item);
                     });
                 }
             })
@@ -396,7 +405,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const seriesId = urlParams.get('id');
 
     if (seriesId) {
-        // Dohvati podatke o seriji
         fetch(`https://api.themoviedb.org/3/tv/${seriesId}?api_key=${apiKey}&language=hr`)
             .then(response => response.json())
             .then(data => {
@@ -415,17 +423,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     `;
 
-                    // Dodavanje serije na Watchlist
                     const addToWatchlistButton = document.getElementById('add-to-watchlist');
                     addToWatchlistButton.addEventListener('click', () => {
                         const item = {
                             id: data.id,
-                            title: data.name, // Naziv serije
+                            title: data.name,
                             poster_path: data.poster_path,
                             release_date: data.first_air_date,
                             overview: data.overview
                         };
-                        addToWatchlist(item); // Koristi funkciju za dodavanje na Watchlist
+                        addToWatchlist(item);
                     });
                 }
             })
@@ -466,7 +473,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const popularMoviesContainer = document.getElementById('popular-movies');
     const filmographyTable = document.querySelector('#filmography tbody');
     if (actorId) {
-        // Dohvati osnovne informacije o glumcu
         fetch(`https://api.themoviedb.org/3/person/${actorId}?api_key=${apiKey}&language=hr`)
             .then(response => response.json())
             .then(actor => {
@@ -505,7 +511,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-//GLUMCI
+
+//glumci na homepage
 let actorsData = [];
 let actorsStartIndex = 0;
 let actorsToShow = 5;
@@ -688,7 +695,6 @@ function loadMovies() {
         moviesContainer.appendChild(movieCard);
     });
 }
-
 function addToWatchlist(movie) {
     const token = localStorage.getItem('token'); // JWT token
 
@@ -718,22 +724,29 @@ function addToWatchlist(movie) {
             }
         })
         .then(result => {
-            alert('Uspješno dodano u Watchlist!'); // Alert za uspješno dodavanje
+            alert('Uspješno dodano u Watchlist!');
         })
         .catch(error => {
-            alert(error.message); // Alert za grešku
+            alert(error.message);
             console.error('Greška:', error);
         });
     } else {
-        alert('Morate se prijaviti da biste dodali u Watchlist!'); // Alert za korisnika koji nije prijavljen
+        alert('Morate se prijaviti da biste dodali u Watchlist!'); 
     }
 }
 
 async function loadComments(movieId) {
     try {
-        const response = await fetch(`http://localhost:8000/comments?movie_id=${movieId}`);
-        const comments = await response.json();
-        console.log('Dohvaćeni komentari:', comments); 
+        const token = localStorage.getItem('token');
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
+        const response = await fetch(`http://localhost:8000/comments?movie_id=${movieId}`, {
+            headers: headers
+        });
+
+        if (!response.ok) throw new Error('Greška pri dohvatu komentara');
+        
+        const comments = await response.json(); 
         const commentsContainer = document.getElementById('comments-container');
         commentsContainer.innerHTML = '';
 
@@ -796,6 +809,8 @@ fetch(`https://api.themoviedb.org/3/trending/movie/week?api_key=${apiKey}&langua
     })
     .catch(error => console.error('Error fetching trending movies:', error));
 
+
+
 //Istraži nove TV serije   
 let seriesData = [];
 let seriesStartIndex = 0;
@@ -830,7 +845,6 @@ function loadSeries() {
         imgElement.alt = title;
         imgElement.classList.add('series-poster');
         imgElement.addEventListener('click', () => {
-            // Preusmjeri na stranicu detalja serije
             window.location.href = `series-details.html?id=${series.id}`;
         });
         seriesCard.appendChild(imgElement);
@@ -850,14 +864,13 @@ function loadSeries() {
 
         seriesCard.appendChild(seriesInfo);
 
-        // Dodavanje dugmeta za Watchlist
         const actionButtons = document.createElement('div');
         actionButtons.classList.add('tv-series-buttons');
 
         const watchlistButton = document.createElement('button');
         watchlistButton.textContent = '+ Watchlist';
         watchlistButton.addEventListener('click', (event) => {
-            event.stopPropagation(); // Sprečava navigaciju pri kliku na dugme
+            event.stopPropagation(); 
             const item = {
                 id: series.id,
                 title: series.name,
@@ -865,7 +878,7 @@ function loadSeries() {
                 release_date: series.first_air_date,
                 overview: series.overview
             };
-            addToWatchlist(item); // Dodaj u Watchlist koristeći centralizovanu funkciju
+            addToWatchlist(item); 
         });
 
         actionButtons.appendChild(watchlistButton);
@@ -900,12 +913,11 @@ fetch(`https://api.themoviedb.org/3/trending/tv/week?api_key=${apiKey}&language=
         return response.json();
     })
     .then(data => {
-        seriesData = data.results.slice(0, 20); // Ograničava na prvih 20 serija
+        seriesData = data.results.slice(0, 20);
         updateSeriesToShow();
         loadSeries();
     })
     .catch(error => console.error('Error fetching trending TV series:', error));
-
 
 
 
@@ -975,6 +987,8 @@ const showMoreBtn = document.getElementById('show-more');
     }
     fetchMovies();
 
+
+    
 //SERIJE U SERIJE.HTML
 let tvPage = 1;
 let tvGenreFilter = 'all';
@@ -1038,4 +1052,3 @@ const tvShowMoreBtn = document.getElementById('show-more');
     }
 
     fetchTVSeries();
-
